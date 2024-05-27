@@ -1,0 +1,23 @@
+{% extends "index.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div>
+    <div>
+        {% if notification %}
+            <p id="notification" class="notification">{{ message }}</p>
+        {% endif %}
+        <h2>Register</h2>
+        <form action="/register" method="post">
+            <p>Username:<br>
+            <input type="text" class="input" name="username">
+            <p>Password:<br>
+            <input type="password" class="input" name="password">
+            <p>Repeat password:<br>
+            <input type="password" class="input" name="password_2">
+            <input type="submit" class="button" value="Create Account">
+        </form>
+        <p>
+        <a href="/">Return</a>
+    </div>
+<div/>
+{% endblock %}
