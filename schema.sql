@@ -1,7 +1,8 @@
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
     username TEXT,
-    password TEXT
+    password TEXT,
+    role TEXT DEFAULT 'user'
 );
 
 CREATE TABLE Chats (

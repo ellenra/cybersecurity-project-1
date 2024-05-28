@@ -32,3 +32,16 @@ def get_comments():
         return result if result else []
     except Exception as e:
         return []
+
+def get_chat_creator(chat_id):
+    result = db.session.execute(text("SELECT user_id FROM chats WHERE id=:chat_id"), {"chat_id": chat_id}).fetchone()
+    return result
+
+def delete_chat(chat_id):
+    try:
+        db.session.execute(text("DELETE FROM chats WHERE id=:chat_id"), {"chat_id": chat_id})
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        return False

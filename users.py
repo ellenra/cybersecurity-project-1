@@ -15,12 +15,16 @@ def register(username, password):
     if username_exists:
         return "Username already exists!"
 
-    hashed_password = generate_password_hash(password)
     try:
-        hashed_password = generate_password_hash(password)
+        ''' Flaw 3: Not hashing password '''
+        password_to_database = password
+
+        ''' Fix 3:
+        password_to_database = generate_password_hash(password) '''
+
         sql = text("INSERT INTO users (username, password) "
                    "VALUES (:username, :password)")
-        db.session.execute(sql, {"username":username, "password":hashed_password})
+        db.session.execute(sql, {"username":username, "password":password_to_database})
         db.session.commit()
         user_id = db.session.execute(text("SELECT id FROM users WHERE username = :username"),
                                      {"username": username}).fetchone()[0]
@@ -32,8 +36,14 @@ def register(username, password):
     return True
 
 def login(username, password):
+    ''' Flaw 2: SQL injection '''
+    sql = text("SELECT password, id FROM Users WHERE username='" + username + "'")
+    result = db.session.execute(sql)
+
+    ''' Fix 2: Change the two lines before this to these:
     sql = text("SELECT password, id FROM Users WHERE username=:username")
-    result = db.session.execute(sql, {"username":username})
+    result = db.session.execute(sql, {"username":username}) '''
+
     user = result.fetchone()
     if not user:
         return False
@@ -48,3 +58,7 @@ def logout():
     session.pop("user_id", None)
     session.pop("username", None)
     session.pop("csrf_token", None)
+
+def check_csrf():
+    if session.get("csrf_token") != request.form.get("csrf_token"):
+        abort(403)
