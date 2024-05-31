@@ -47,8 +47,11 @@ def login(username, password):
     user = result.fetchone()
     if not user:
         return False
+
+    ''' Fix 3:
     if not check_password_hash(user[0], password):
-        return False
+        return False '''
+
     session["username"] = username
     session["user_id"] = user[1]
     session["csrf_token"] = os.urandom(16).hex()
@@ -62,3 +65,10 @@ def logout():
 def check_csrf():
     if session.get("csrf_token") != request.form.get("csrf_token"):
         abort(403)
+
+def get_username(user_id):
+    try:
+        result = db.session.execute(text("SELECT username FROM users WHERE id=:user_id"), {"user_id": user_id}).fetchone()
+        return result[0]
+    except Exception as e:
+        return []

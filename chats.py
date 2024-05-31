@@ -45,3 +45,10 @@ def delete_chat(chat_id):
     except Exception as e:
         db.session.rollback()
         return False
+
+def get_chat_info(chat_id):
+    try:
+        result = db.session.execute(text("SELECT * FROM chats WHERE id=:chat_id"), {"chat_id": chat_id}).fetchone()
+        return result if result else []
+    except Exception as e:
+        return []

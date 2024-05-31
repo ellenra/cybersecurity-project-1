@@ -1,4 +1,4 @@
-from flask import render_template, request, session, redirect, flash, get_flashed_messages
+from flask import render_template, request, session, redirect, flash, get_flashed_messages, url_for
 import datetime
 from app import app
 import users
@@ -41,6 +41,16 @@ def logout():
     users.logout()
     return redirect("/")
 
+@app.route("/chat")
+def chat():
+    chat_id = request.args.get("chat_id")
+    chat = chats.get_chat_info(chat_id)
+    user_id = session.get("user_id")
+    username = users.get_username(user_id)
+    comments = chats.get_comments()
+    notifications = get_flashed_messages()
+    return render_template("chat.html", user=user_id, chat=chat, comments=comments, notifications=notifications, username=username)
+
 @app.route("/create_chat", methods=["POST"])
 def create_chat():
     if not session.get("user_id"):
@@ -72,13 +82,13 @@ def new_comment():
     comment = request.form["comment"]
     result = chats.create_comment(user_id, chat_id, comment)
     if result:
-        return redirect("/")
+        return redirect(url_for("chat", chat_id=chat_id))
 
     ''' Fix 4:
     app.logger.warning("Comment could not be created, user id: {}, chat id: {}, comment: {}, time: {}".format(user_id, chat_id, comment, datetime.datetime.now())) '''
 
     flash("Error in adding comment!")
-    return redirect("/")
+    return redirect(url_for("chat", chat_id=chat_id))
 
 @app.route("/delete", methods=["POST"])
 def delete():
@@ -95,7 +105,6 @@ def delete():
     if chat_creator[0] != user_id:
         flash("You can only delete your own chats!")
         return redirect("/") '''
-
     chats.delete_chat(chat_id)
     flash("Chat deleted!")
     return redirect("/")

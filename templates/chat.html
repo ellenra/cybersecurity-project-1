@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+
+{% block content %}
+    <h2>{{ username }} - {{ chat[2] }}</h2>
+    {% if chat[1] == user %}
+    <form action="/delete" method="POST">
+        <input type="hidden" name="chat_id" value="{{ chat[0] }}">
+        <input type="submit" value="Delete chat">
+    </form>
+    {% endif %}
+    <ul>
+        {% for comment in comments %}
+            {% if comment.chat_id == chat.id %}
+                <li>{{ username }} - {{ comment.comment }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <form action="/new_comment" method="POST">
+        {# Fix 1: #}
+        {# <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> #}
+        <input type="hidden" name="chat_id" value="{{ chat.id }}">
+        <input type="text" class="input" name="comment" placeholder="Leave a comment">
+        <input type="submit" class="button" value="Comment">
+    </form>
+    <br>
+    <a href="/">Return</a>
+{% endblock %}
